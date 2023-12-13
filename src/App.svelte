@@ -11,7 +11,6 @@
     async function handleFileChange(event) {
         const file = event.target.files[0];
         if (file) {
-			console.log('File received:', file);
             try {
                 imageBase64 = await encodeImageToBase64(file);
 				const completions = await completionsVision(imageBase64);
@@ -46,7 +45,7 @@
 
 	{#if imageAnalysisResult}
 	<div class="response-container">
-		<h2>Analysis Result:</h2>
+		<h2>Analysis Food:</h2>
 		{#if imageAnalysisResult.ingredients}
 			<h3>{imageAnalysisResult.food_name}</h3>
 			<ul class="ingredients-list">
@@ -58,7 +57,6 @@
 	</div>
 	{:else if imageBase64}
 	<div class="response-container">
-		<h2>Analysis Result:</h2>
 		<p>Processing...</p>
 	</div>
 	{/if}

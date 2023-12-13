@@ -8,7 +8,9 @@ export function encodeImageToBase64(file) {
             bytes.forEach((b) => binary += String.fromCharCode(b));
             const base64String = window.btoa(binary);
 
-            resolve(`data:image/jpeg;base64,${base64String}`);
+            // Use the file's type to support different image formats
+            const dataUri = `data:${file.type};base64,${base64String}`;
+            resolve(dataUri);
         };
         reader.onerror = reject;
         reader.readAsArrayBuffer(file);
