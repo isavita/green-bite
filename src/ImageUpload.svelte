@@ -1,7 +1,7 @@
 <script>
     import { encodeImageToBase64 } from './imageUtils.js';
 
-    let imageBase64;
+    let imageBase64 = null;
 
     async function handleFileChange(event) {
         const file = event.target.files[0];
@@ -15,36 +15,28 @@
     }
 </script>
 
+<style>
+    .image-preview {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
 <main>
-    <h1>Welcome to Green-Bite</h1>
+    <h1>Upload Image</h1>
     <input type="file" accept="image/*" on:change="{handleFileChange}" />
 
     {#if imageBase64}
-        <div class="image-container">
-            <img src="{imageBase64}" alt="Uploaded Image Preview" class="image-preview" />
+        <div class="image-preview">
+            <img src="{imageBase64}" alt="Uploaded Image Preview" />
         </div>
     {/if}
 </main>
 
-<style>
-main {
-	text-align: center;
-	padding: 1em;
-	background: #f9f9f9;
-}
-
-.image-container {
-	position: relative;
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.image-preview {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
-}
-</style>
