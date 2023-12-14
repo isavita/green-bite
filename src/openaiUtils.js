@@ -177,3 +177,57 @@ Calculate the total CO2 for this recipe in grams.
         console.error('Error posting message to thread:', error);
     }
 }
+
+export async function initiateRun(threadId, assistantId) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const threadsRunUrl = `https://api.openai.com/v1/threads/${threadId}/runs`;
+
+    const headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v1'
+    };
+
+    const payload = {
+        assistant_id: assistantId
+    };
+
+    try {
+        const response = await axios.post(threadsRunUrl, payload, { headers: headers, timeout: timeout });
+        const threadRunId = response.data.id;
+        return threadRunId;
+    } catch (error) {
+        console.error('Error initiating run:', error);
+    }
+}
+
+export async function pollRunStatusAndGetMessage(threadId, runId) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const threadsRunStatusUrl = `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`;
+    const threadsMessagesUrl = `https://api.openai.com/v1/threads/${threadId}/messages`;
+
+    const headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v1'
+    };
+
+    try {
+        let runStatus;
+        do {
+            const statusResponse = await axios.get(threadsRunStatusUrl, { headers: headers });
+            runStatus = statusResponse.data.state;
+            if (runStatus !== 'completed' && runStatus !== 'failed' && runStatus !== 'expired') {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        } while (runStatus !== 'completed' && runStatus !== 'failed' && runStatus !== 'expired');
+
+        const messagesResponse = await axios.get(threadsMessagesUrl, { headers: headers, timeout: timeout });
+        const lastMessage = messagesResponse.data.data[0] || {};
+        return lastMessage;
+    } catch (error) {
+        console.error('Error polling run status or retrieving message:', error);
+    }
+}
+
+
