@@ -18,17 +18,9 @@
         if (file) {
             try {
                 imageBase64 = await encodeImageToBase64(file);
-				// const completions = await completionsVision(imageBase64);
-				// content = extractImageAnalysisContent(completions);
-				// imageAnalysisResult = parseJsonContent(content);
-				imageAnalysisResult =  {
-					"food_name": "Open Faced Liver Pate Sandwich with Pickles",
-					"ingredients": [
-					{"name": "liver pate", "grams": 50},
-					{"name": "rye bread", "grams": 70},
-					{"name": "pickle", "grams": 30}
-					]
-				};
+				const completions = await completionsVision(imageBase64);
+				content = extractImageAnalysisContent(completions);
+				imageAnalysisResult = parseJsonContent(content);
             } catch (error) {
                 console.error('Error processing the image:', error);
             }
