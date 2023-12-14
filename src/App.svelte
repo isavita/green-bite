@@ -13,9 +13,17 @@
         if (file) {
             try {
                 imageBase64 = await encodeImageToBase64(file);
-				const completions = await completionsVision(imageBase64);
-				const content = extractImageAnalysisContent(completions);
-				imageAnalysisResult = parseJsonContent(content);
+				// const completions = await completionsVision(imageBase64);
+				// const content = extractImageAnalysisContent(completions);
+				// imageAnalysisResult = parseJsonContent(content);
+				imageAnalysisResult =  {
+					"food_name": "Open Faced Liver Pate Sandwich with Pickles",
+					"ingredients": [
+					{"name": "liver pate", "grams": 50},
+					{"name": "rye bread", "grams": 70},
+					{"name": "pickle", "grams": 30}
+					]
+				};
             } catch (error) {
                 console.error('Error processing the image:', error);
             }
@@ -30,6 +38,17 @@
         } else {
             return JSON.stringify(imageAnalysisResult, null, 2);
         }
+    }
+
+	let calculatingCO2e = false;
+    let totalCO2eGrams = null;
+	async function calculateCO2e() {
+        calculatingCO2e = true;
+		totalCO2eGrams = null;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        totalCO2eGrams = 250;
+
+        calculatingCO2e = false;
     }
 </script>
 
@@ -60,6 +79,20 @@
 		<p>Processing...</p>
 	</div>
 	{/if}
+
+	{#if imageAnalysisResult && imageAnalysisResult.ingredients}
+		<button on:click="{calculateCO2e}" disabled={calculatingCO2e}>
+			{#if calculatingCO2e}
+				Calculating...
+			{:else}
+				Calculate CO2e in Grams
+			{/if}
+		</button>
+
+		{#if totalCO2eGrams !== null}
+			<p>Total CO2e: {totalCO2eGrams} grams</p>
+		{/if}
+    {/if}
 </main>
 
 <style>
