@@ -55,6 +55,9 @@ RESPONSE EXAMPLES:
 DO NOT ADD ANYTHING ELSE to your response
 `
 
+
+const threadsApiUrl = "https://api.openai.com/v1/threads";
+
 export function extractImageAnalysisContent(str) {
     const startPattern = "```json";
     const endPattern = "```";
@@ -113,8 +116,6 @@ export async function completionsVision(imageBase64) {
         return content;
     } catch (error) {
         if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
             console.error(error.response.data);
             console.error(error.response.status);
             console.error(error.response.headers);
@@ -126,5 +127,53 @@ export async function completionsVision(imageBase64) {
             console.error('Error', error.message);
         }
         console.error(error.config);
+    }
+}
+
+export async function createThread() {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    const headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v1'
+    };
+
+    try {
+        const response = await axios.post(threadsApiUrl, {}, { headers: headers, timeout: timeout });
+        const threadId = response.data.id;
+        return threadId;
+    } catch (error) {
+        // Handle errors here
+        console.error('Error creating thread:', error);
+    }
+}
+
+export async function postThreadMessage(threadId, recipe) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const threadsMessagesUrl = `https://api.openai.com/v1/threads/${threadId}/messages`;
+
+    const headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v1'
+    };
+
+    const messageContent = `
+${JSON.stringify(recipe)}
+Calculate the total CO2 for this recipe in grams.
+`;
+
+    const messagePayload = {
+        role: "user",
+        content: messageContent
+    };
+
+    try {
+        const response = await axios.post(threadsMessagesUrl, messagePayload, { headers: headers, timeout: timeout });
+        return response.data; 
+    } catch (error) {
+        // Handle errors here
+        console.error('Error posting message to thread:', error);
     }
 }
