@@ -19,7 +19,7 @@
             try {
                 imageBase64 = await encodeImageToBase64(file);
 				const completions = await completionsVision(imageBase64);
-				content = extractImageAnalysisContent(completions);
+				const content = extractImageAnalysisContent(completions);
 				imageAnalysisResult = parseJsonContent(content);
             } catch (error) {
                 console.error('Error processing the image:', error);
