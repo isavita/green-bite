@@ -216,11 +216,21 @@ export async function pollRunStatusAndGetMessage(threadId, runId) {
         let runStatus;
         do {
             const statusResponse = await axios.get(threadsRunStatusUrl, { headers: headers });
-            runStatus = statusResponse.data.state;
+            runStatus = statusResponse.data.status;
+
+            console.log('Current run status:', runStatus); // Add this log to check the status
+
             if (runStatus !== 'completed' && runStatus !== 'failed' && runStatus !== 'expired') {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
+
+            // Check if runStatus is undefined or null
+            if (typeof runStatus === 'undefined' || runStatus === null) {
+                throw new Error('Run status is undefined or null');
+            }
+
         } while (runStatus !== 'completed' && runStatus !== 'failed' && runStatus !== 'expired');
+
 
         const messagesResponse = await axios.get(threadsMessagesUrl, { headers: headers, timeout: timeout });
         const lastMessage = messagesResponse.data.data[0] || {};
@@ -231,3 +241,27 @@ export async function pollRunStatusAndGetMessage(threadId, runId) {
 }
 
 
+export function extractTotalCO2eGramsFromMessage(message) {
+    if (message && message.content && message.content.length > 0) {
+        const firstContentItem = message.content[0];
+
+        if (firstContentItem.type === 'text' && firstContentItem.text && firstContentItem.text.value) {
+            const textValue = firstContentItem.text.value;
+
+            const jsonMatch = textValue.match(/```json({.*})```/);
+            if (jsonMatch && jsonMatch[1]) {
+                try {
+                    const parsedJson = JSON.parse(jsonMatch[1]);
+                    return parsedJson["result"] || jsonMatch;
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    return textValue; 
+                }
+            } else {
+                return textValue;
+            }
+        }
+    }
+
+    return null;
+}

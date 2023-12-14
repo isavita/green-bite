@@ -3,7 +3,12 @@
 	import { 
 		completionsVision,
 		extractImageAnalysisContent,
-		parseJsonContent
+		parseJsonContent,
+        createThread,
+        postThreadMessage,
+        initiateRun,
+        pollRunStatusAndGetMessage,
+		extractTotalCO2eGramsFromMessage
 	} from './openaiUtils.js';
 
     let imageBase64, imageAnalysisResult;
@@ -14,7 +19,7 @@
             try {
                 imageBase64 = await encodeImageToBase64(file);
 				// const completions = await completionsVision(imageBase64);
-				// const content = extractImageAnalysisContent(completions);
+				// content = extractImageAnalysisContent(completions);
 				// imageAnalysisResult = parseJsonContent(content);
 				imageAnalysisResult =  {
 					"food_name": "Open Faced Liver Pate Sandwich with Pickles",
@@ -42,11 +47,34 @@
 
 	let calculatingCO2e = false;
     let totalCO2eGrams = null;
+
 	async function calculateCO2e() {
         calculatingCO2e = true;
-		totalCO2eGrams = null;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        totalCO2eGrams = 250;
+        totalCO2eGrams = null;
+
+		const assistantId = 'asst_U46V8wX7fdNlSHpiqirdkAsj';
+
+        try {
+            console.log('Creating thread...');
+			const threadId = await createThread();
+			console.log('Thread created with ID:', threadId);
+
+			console.log('Posting thread message...');
+			await postThreadMessage(threadId, imageAnalysisResult);
+
+			console.log('Initiating run...');
+			const runId = await initiateRun(threadId, assistantId);
+			console.log('Run initiated with ID:', runId);
+
+			console.log('Polling run status...');
+			const lastMessage = await pollRunStatusAndGetMessage(threadId, runId);
+			console.log('Run completed, last message:', lastMessage);
+			
+            totalCO2eGrams = extractTotalCO2eGramsFromMessage(lastMessage); 
+        } catch (error) {
+            console.error('Error calculating CO2e:', error);
+            totalCO2eGrams = 'Error in calculation';
+        }
 
         calculatingCO2e = false;
     }
