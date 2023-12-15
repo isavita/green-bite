@@ -59,7 +59,7 @@
 
 			console.log('Polling run status...');
 			const lastMessage = await pollRunStatusAndGetMessage(threadId, runId);
-			console.log('Run completed, last message:', lastMessage);
+			console.log('Run completed');
 			
             totalCO2eGrams = extractTotalCO2eGramsFromMessage(lastMessage); 
         } catch (error) {
