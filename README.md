@@ -28,9 +28,10 @@ cd green-bite
 npm install
 ```
 3. Set up your environment variables:
-Create a .env file at the root of the project and add your OpenAI API key:
+Create a .env file at the root of the project and add your OPENAI_API_KEY and ASSISTANT_ID:
 ```text
-OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+ASSISTANT_ID=your_assistant_id_here
 ```
 
 ## Usage

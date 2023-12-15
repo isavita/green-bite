@@ -127,12 +127,13 @@
 
 main {
     text-align: center;
-    padding: 2em;
+    padding: 0.5em;
     max-width: 1024;
     margin: 0 auto;
 }
 
 h1 {
+    margin-top: 0;
     font-size: 2.5em;
     font-weight: 600;
     letter-spacing: -1px;
