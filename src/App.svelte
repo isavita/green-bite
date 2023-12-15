@@ -11,11 +11,13 @@
 		extractTotalCO2eGramsFromMessage
 	} from './openaiUtils.js';
 
-    let imageBase64, imageAnalysisResult;
+    let imageBase64, imageAnalysisResult, totalCO2eGrams;
+	let calculatingCO2e = false;
 
     async function handleFileChange(event) {
         const file = event.target.files[0];
         if (file) {
+			imageBase64, imageAnalysisResult, totalCO2eGrams = null;
             try {
                 imageBase64 = await encodeImageToBase64(file);
 				const completions = await completionsVision(imageBase64);
@@ -36,9 +38,6 @@
             return JSON.stringify(imageAnalysisResult, null, 2);
         }
     }
-
-	let calculatingCO2e = false;
-    let totalCO2eGrams = null;
 
 	async function calculateCO2e() {
         calculatingCO2e = true;
@@ -73,13 +72,13 @@
 </script>
 
 <main>
-    <h1>Welcome to Green-Bite</h1>
+    <h1>Green Bite</h1>
     <input type="file" accept="image/*" on:change="{handleFileChange}" />
 
     {#if imageBase64}
-        <div class="image-container">
-            <img src="{imageBase64}" alt="Uploaded Image Preview" class="image-preview" />
-        </div>
+	<div class="image-container">
+		<img src="{imageBase64}" alt="" class="image-preview" />
+	</div>
     {/if}
 
 	{#if imageAnalysisResult}
@@ -101,64 +100,97 @@
 	{/if}
 
 	{#if imageAnalysisResult && imageAnalysisResult.ingredients}
-		<button on:click="{calculateCO2e}" disabled={calculatingCO2e}>
-			{#if calculatingCO2e}
-				Calculating...
-			{:else}
-				Calculate CO2e in Grams
-			{/if}
-		</button>
+	<button on:click="{calculateCO2e}" disabled={calculatingCO2e} class="calculate-button">
+		{#if calculatingCO2e}
+			Calculating...
+		{:else}
+			Calculate CO2e
+		{/if}
+	</button>
 
 		{#if totalCO2eGrams !== null}
-			<p>Total CO2e: {totalCO2eGrams} grams</p>
+			<p class="co2e-result">Total CO2e: {totalCO2eGrams} g</p>
 		{/if}
     {/if}
 </main>
 
 <style>
+:root {
+    --primary-color:  #8FBC8F;
+    --secondary-color: #228B22;
+    --text-color: #333333;
+    --background-color: #DDDDDD;
+	--border-color: #DDDDDD;
+    --response-bg-color: #F8F8F8;
+    --button-border-radius: 20px;
+}
+
 main {
-	text-align: center;
-	padding: 1em;
-	background: #f9f9f9;
+    text-align: center;
+    padding: 2em;
+    max-width: 1024;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5em;
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-bottom: 0.5em;
 }
 
 .image-container {
-	position: relative;
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	max-width: 512px;
+    margin: 1em auto;
+	text-align: center;
 }
 
 .image-preview {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .response-container {
-	margin-top: 20px;
-	padding: 15px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	background-color: #f8f8f8;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--response-bg-color);
 }
 
 .ingredients-list {
-	list-style-type: none;
-	padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 .ingredients-list li {
-	margin: 5px 0;
-	font-size: 1.1em;
+    margin: 5px 0;
+    font-size: 1em;
 }
 
 pre {
-	background-color: #eee;
-	padding: 10px;
-	border-radius: 4px;
-	white-space: pre-wrap;
+    background-color: var(--response-bg-color);
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+}
+
+.calculate-button {
+    padding: 10px 20px;
+    border: 2px solid var(--secondary-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 20px;
+    border-radius: var(--button-border-radius); /* Apply rounded corners */
+}
+
+.co2e-result {
+    margin-top: 10px;
+    font-size: 1em;
+    color: var(--text-color);
 }
 </style>
