@@ -119,9 +119,11 @@
     --primary-color:  #8FBC8F;
     --secondary-color: #228B22;
     --text-color: #333333;
-    --background-color: #DDDDDD;
+    --background-color: #f5f5f5;
 	--border-color: #DDDDDD;
     --response-bg-color: #F8F8F8;
+    --accent-color: #8BC34A;
+    --error-color: #F44336;
     --button-border-radius: 20px;
 }
 
@@ -193,5 +195,9 @@ pre {
     margin-top: 10px;
     font-size: 1em;
     color: var(--text-color);
+}
+
+button:hover {
+  background-color: var(--accent-color);
 }
 </style>
