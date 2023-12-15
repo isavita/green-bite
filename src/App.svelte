@@ -43,7 +43,7 @@
         calculatingCO2e = true;
         totalCO2eGrams = null;
 
-		const assistantId = 'asst_U46V8wX7fdNlSHpiqirdkAsj';
+		const assistantId = process.env.ASSISTANT_ID;
 
         try {
             console.log('Creating thread...');

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
     "sirv-cli": "^2.0.0"
   }
 }
